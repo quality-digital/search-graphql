@@ -403,7 +403,7 @@ export const queries = {
     }
     
     return {
-      translatedArgs,
+      translatedArgs: compatibilityArgs,
       searchMetaData,
       productsRaw,
       canonical

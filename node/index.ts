@@ -5,6 +5,7 @@ import { Cached, LRUCache, RecorderState, Service } from '@vtex/api'
 import { Clients } from './clients'
 import { schemaDirectives } from './directives'
 import { resolvers } from './resolvers'
+import { SearchClient } from './typings/SearchClient'
 
 const TWO_SECONDS_MS = 2 * 1000
 const THREE_SECONDS_MS = 3 * 1000
@@ -20,7 +21,15 @@ metrics.trackCache('segment', segmentCache)
 metrics.trackCache('search', searchCache)
 metrics.trackCache('messages', messagesCache)
 
-export default new Service<Clients, RecorderState, CustomContext>({
+interface SearchClients {
+  search: SearchClient
+}
+
+export default new Service<
+  Clients & SearchClients,
+  RecorderState,
+  CustomContext
+>({
   clients: {
     implementation: Clients,
     options: {

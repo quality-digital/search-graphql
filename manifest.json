@@ -12,7 +12,8 @@
   },
   "dependencies": {
     "vtex.messages": "1.x",
-    "vtex.catalog-api-proxy": "0.x"
+    "vtex.catalog-api-proxy": "0.x",
+    "acupula.rich-relevance": "0.x"
   },
   "policies": [
     {
@@ -26,6 +27,9 @@
     },
     {
       "name": "colossus-fire-event"
+    },
+    {
+      "name": "acupula.rich-relevance:catalog-proxy"
     }
   ],
   "$schema": "https://raw.githubusercontent.com/vtex/node-vtex-api/master/gen/manifest.schema"

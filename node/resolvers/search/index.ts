@@ -357,8 +357,7 @@ export const queries = {
     }
     const products = await rrsearch.products(args)
     searchFirstElements(products, args.from, ctx.clients.search)
-    // return products
-    return rrsearch.products(args)
+    return products
   },
 
   productsByIdentifier: async (
@@ -396,6 +395,7 @@ export const queries = {
   },
 
   productSearch: async (_: any, args: SearchArgs, ctx: Context, info: any) => {
+    console.log('======================================> args', args)
     const {
       clients: { search },
     } = ctx

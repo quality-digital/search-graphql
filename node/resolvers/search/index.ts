@@ -34,11 +34,7 @@ import {
 } from './utils'
 import * as searchStats from '../stats/searchStats'
 import { toCompatibilityArgs, hasFacetsBadArgs } from './newURLs'
-import {
-  PATH_SEPARATOR,
-  MAP_VALUES_SEP,
-  FACETS_BUCKET,
-} from './constants'
+import { PATH_SEPARATOR, MAP_VALUES_SEP, FACETS_BUCKET } from './constants'
 import { staleFromVBaseWhileRevalidate } from '../../utils/vbase'
 
 interface ProductIndentifier {
@@ -224,7 +220,7 @@ export const queries = {
     ctx: Context
   ) => {
     const {
-      clients: { search },
+      clients: { rrsearch },
     } = ctx
 
     if (!args.searchTerm) {
@@ -234,7 +230,7 @@ export const queries = {
       ctx,
       args.searchTerm
     )
-    const { itemsReturned } = await search.autocomplete({
+    const { itemsReturned } = await rrsearch.autocomplete({
       maxRows: args.maxRows,
       searchTerm: translatedTerm,
     })
@@ -345,7 +341,7 @@ export const queries = {
 
   products: async (_: any, args: SearchArgs, ctx: Context) => {
     const {
-      clients: { search },
+      clients: { rrsearch },
     } = ctx
     const queryTerm = args.query
     if (queryTerm == null || test(/[?&[\]=]/, queryTerm)) {
@@ -359,9 +355,10 @@ export const queries = {
         `The maximum value allowed for the 'to' argument is 2500`
       )
     }
-    const products = await search.products(args)
+    const products = await rrsearch.products(args)
     searchFirstElements(products, args.from, ctx.clients.search)
-    return products
+    // return products
+    return rrsearch.products(args)
   },
 
   productsByIdentifier: async (
@@ -512,7 +509,7 @@ export const queries = {
     )
     return getSearchMetaData(_, compatibilityArgs, ctx)
   },
-  /* All search engines need to implement the topSearches, searchSuggestions, and productSuggestions queries. 
+  /* All search engines need to implement the topSearches, searchSuggestions, and productSuggestions queries.
   VTEX search doesn't support these queries, so it always returns empty results as a placeholder. */
   topSearches: () => {
     return {

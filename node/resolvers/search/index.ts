@@ -199,14 +199,14 @@ export const queries = {
     ctx: Context
   ) => {
     const {
-      clients: { search },
+      clients: { rrsearch },
     } = ctx
 
     if (!args.searchTerm) {
       throw new UserInputError('No search term provided')
     }
     const translatedTerm = await translateToStoreDefaultLanguage(ctx, args.searchTerm)
-    const { itemsReturned } = await search.autocomplete({
+    const { itemsReturned } = await rrsearch.autocomplete({
       maxRows: args.maxRows,
       searchTerm: translatedTerm,
     })
@@ -233,7 +233,7 @@ export const queries = {
       ? filterSpecificationFilters({...args, query: compatibilityArgs.query, map: compatibilityArgs.map } as Required<FacetsArgs>)
       : (compatibilityArgs as Required<FacetsArgs>)
 
-    
+
     if (hasFacetsBadArgs(filteredArgs)) {
       throw new UserInputError('No query or map provided')
     }
@@ -245,7 +245,7 @@ export const queries = {
     const unavailableString = hideUnavailableItems
       ? `&fq=isAvailablePerSalesChannel_${salesChannel}:1`
       : ''
-    
+
     const assembledQuery = `${filteredQuery}?map=${filteredMap}${unavailableString}`
     const facetsResult = await staleFromVBaseWhileRevalidate(vbase, FACETS_BUCKET, assembledQuery.replace(unavailableString, ''), search.facets, assembledQuery)
 
@@ -305,7 +305,7 @@ export const queries = {
 
   products: async (_: any, args: SearchArgs, ctx: Context) => {
     const {
-      clients: { search },
+      clients: { rrsearch },
     } = ctx
     const queryTerm = args.query
     if (queryTerm == null || test(/[?&[\]=]/, queryTerm)) {
@@ -319,9 +319,10 @@ export const queries = {
         `The maximum value allowed for the 'to' argument is 2500`
       )
     }
-    const products = await search.products(args)
+    const products = await rrsearch.products(args)
     searchFirstElements(products, args.from, ctx.clients.search)
-    return products
+    // return products
+    return rrsearch.products(args)
   },
 
   productsByIdentifier: async (
@@ -364,7 +365,7 @@ export const queries = {
     } = ctx
     const queryTerm = args.query
     args.map = args.map && decodeURIComponent(args.map)
-  
+
     if (queryTerm == null || test(/[?&[\]=]/, queryTerm)) {
       throw new UserInputError(
         `The query term contains invalid characters. query=${queryTerm}`
@@ -393,7 +394,7 @@ export const queries = {
     ])
 
     searchFirstElements(productsRaw.data, args.from, search)
-    
+
      if (productsRaw.status === 200) {
       searchStats.count(ctx, args)
     }
@@ -423,7 +424,7 @@ export const queries = {
       productId,
       searchType
     )
-    
+
     searchFirstElements(products, 0, ctx.clients.search)
     // We add a custom cacheId because these products are not exactly like the other products from search apis.
     // Each product is basically a SKU and you may have two products in response with same ID but each one representing a SKU.

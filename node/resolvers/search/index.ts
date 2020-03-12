@@ -103,10 +103,11 @@ const translateToStoreDefaultLanguage = async (
 const noop = () => {}
 
 // Does prefetching and warms up cache for up to the 10 first elements of a search, so if user clicks on product page
+// const searchFirstElements = (products: SearchProduct[], from: number | null = 0, search: Context['clients']['search'] )
 const searchFirstElements = (
   products: SearchProduct[],
   from: number | null = 0,
-  search: Context['clients']['search']
+  search: Context['clients']['rrsearch']
 ) => {
   if (from !== 0 || from == null) {
     // We do not want this for pages other than the first
@@ -356,7 +357,7 @@ export const queries = {
       )
     }
     const products = await rrsearch.products(args)
-    searchFirstElements(products, args.from, ctx.clients.search)
+    searchFirstElements(products, args.from, ctx.clients.rrsearch)
     return products
   },
 
@@ -395,9 +396,8 @@ export const queries = {
   },
 
   productSearch: async (_: any, args: SearchArgs, ctx: Context, info: any) => {
-    console.log('======================================> args', args)
     const {
-      clients: { search },
+      clients: { rrsearch, search },
     } = ctx
     const queryTerm = args.query
 
@@ -441,7 +441,7 @@ export const queries = {
         : emptyTitleTag,
     ])
 
-    searchFirstElements(productsRaw.data, args.from, search)
+    searchFirstElements(productsRaw.data, args.from, rrsearch)
 
     if (productsRaw.status === 200) {
       searchStats.count(ctx, args)
@@ -473,7 +473,7 @@ export const queries = {
       searchType
     )
 
-    searchFirstElements(products, 0, ctx.clients.search)
+    searchFirstElements(products, 0, ctx.clients.rrsearch)
     // We add a custom cacheId because these products are not exactly like the other products from search apis.
     // Each product is basically a SKU and you may have two products in response with same ID but each one representing a SKU.
     return products.map(product => {

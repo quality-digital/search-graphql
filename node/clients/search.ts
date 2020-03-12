@@ -123,11 +123,11 @@ export class Search extends AppClient {
     })
   }
 
-  // public products = (args: SearchArgs) => {
-  //   return this.get<SearchProduct[]>(this.productSearchUrl(args), {
-  //     metric: 'search-products',
-  //   })
-  // }
+  public products = (args: SearchArgs) => {
+    return this.get<SearchProduct[]>(this.productSearchUrl(args), {
+      metric: 'search-products',
+    })
+  }
 
   public productsQuantity = async (args: SearchArgs) => {
     const {

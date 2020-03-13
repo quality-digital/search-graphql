@@ -101,7 +101,7 @@ const noop = () => { }
 
 // Does prefetching and warms up cache for up to the 10 first elements of a search, so if user clicks on product page
 // const searchFirstElements = (products: SearchProduct[], from: number | null = 0, search: Context['clients']['search'] )
-const searchFirstElements = (products: SearchProduct[], from: number | null = 0, search: Context['clients']['rrsearch'] ) => {
+const searchFirstElements = (products: SearchProduct[], from: number | null = 0, search: Context['clients']['search'] ) => {
   if (from !== 0 || from == null) {
     // We do not want this for pages other than the first
     return
@@ -306,7 +306,7 @@ export const queries = {
 
   products: async (_: any, args: SearchArgs, ctx: Context) => {
     const {
-      clients: { rrsearch },
+      clients: { search },
     } = ctx
     const queryTerm = args.query
     if (queryTerm == null || test(/[?&[\]=]/, queryTerm)) {
@@ -320,8 +320,8 @@ export const queries = {
         `The maximum value allowed for the 'to' argument is 2500`
       )
     }
-    const products = await rrsearch.products(args)
-    searchFirstElements(products, args.from, ctx.clients.rrsearch)
+    const products = await search.products(args)
+    searchFirstElements(products, args.from, ctx.clients.search)
     return products
   },
 
@@ -361,7 +361,7 @@ export const queries = {
 
   productSearch: async (_: any, args: SearchArgs, ctx: Context, info: any) => {
     const {
-      clients: { rrsearch, search },
+      clients: { search, rrsearch },
     } = ctx
     const queryTerm = args.query
     args.map = args.map && decodeURIComponent(args.map)
@@ -387,13 +387,13 @@ export const queries = {
     const compatibilityArgs = await getCompatibilityArgs<SearchArgs>(ctx, translatedArgs)
 
     const [productsRaw, searchMetaData] = await Promise.all([
-      search.productsRaw(compatibilityArgs),
+      rrsearch.productsRaw(compatibilityArgs),
       isQueryingMetadata(info)
         ? getSearchMetaData(_, compatibilityArgs, ctx)
         : emptyTitleTag,
     ])
 
-    searchFirstElements(productsRaw.data, args.from, rrsearch)
+    searchFirstElements(productsRaw.data, args.from, search)
 
      if (productsRaw.status === 200) {
       searchStats.count(ctx, args)
@@ -425,7 +425,7 @@ export const queries = {
       searchType
     )
 
-    searchFirstElements(products, 0, ctx.clients.rrsearch)
+    searchFirstElements(products, 0, ctx.clients.search)
     // We add a custom cacheId because these products are not exactly like the other products from search apis.
     // Each product is basically a SKU and you may have two products in response with same ID but each one representing a SKU.
     return products.map(product => {
@@ -438,6 +438,7 @@ export const queries = {
   },
 
   searchMetadata: async (_: any, args: SearchMetadataArgs, ctx: Context) => {
+    console.log('argssssssss ', args)
     const queryTerm = args.query
     if (queryTerm == null || test(/[?&[\]=]/, queryTerm)) {
       throw new UserInputError(

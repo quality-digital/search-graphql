@@ -20,7 +20,6 @@ enum SimulationBehavior {
   DEFAULT = 'default'
 }
 
-
 const inflightKey = ({ baseURL, url, params, headers }: RequestConfig) => {
   return (
     baseURL! +

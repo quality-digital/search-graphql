@@ -10,6 +10,11 @@ import { stringify } from 'qs'
 
 import { searchEncodeURI, SearchCrossSellingTypes } from '../resolvers/search/utils'
 
+interface AutocompleteArgs {
+  maxRows: number | string
+  searchTerm: string
+}
+
 enum SimulationBehavior {
   SKIP = 'skip',
   DEFAULT = 'default'

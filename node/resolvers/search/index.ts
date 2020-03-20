@@ -486,7 +486,6 @@ export const queries = {
   },
 
   searchMetadata: async (_: any, args: SearchMetadataArgs, ctx: Context) => {
-    console.log('argssssssss ', args)
     const queryTerm = args.query
     if (queryTerm == null || test(/[?&[\]=]/, queryTerm)) {
       throw new UserInputError(
